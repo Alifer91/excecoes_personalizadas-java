@@ -4,6 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import model.exceptions.DomainException;
+
 public class Reservation {
 	private Integer roomNumber;
 	private Date checkIn;
@@ -14,8 +16,10 @@ public class Reservation {
 	public Reservation(){
 	}
 
-	public Reservation(Integer roomNumber, Date checkIn, Date checkOut) {
-		
+	public Reservation(Integer roomNumber, Date checkIn, Date checkOut) throws DomainException {//não precisa ter throws se DomainException for extends runtime
+		if(!checkOut.after(checkIn)) {
+			throw new DomainException("Error in reservation: Check-out date must be after check-in date") ;
+		}
 		this.roomNumber = roomNumber;
 		this.checkIn = checkIn;
 		this.checkOut = checkOut;
@@ -40,18 +44,21 @@ public class Reservation {
 		long diff= checkOut.getTime()-checkIn.getTime();//get time retorna valor em milissegundos(long) 
 		return TimeUnit.DAYS.convert(diff,TimeUnit.MILLISECONDS); //converte os milisegundos em dias  e dentro dos parenteses deve ser colocado o tipo de unidade de tempo
 	}
-	public String updateDates(Date checkIn, Date checkOut) {
+	public void updateDates(Date checkIn, Date checkOut) throws DomainException {//não precisa ter throws se DomainException for extends runtime
 		Date now = new Date();
-		if(checkIn.before(now)|| checkOut.before(now)){//trouxe as validações para a classe adequada
-			return "Error in reservation: Reservation dates for update must be future dates";
+		if(checkIn.before(now)|| checkOut.before(now)){
+			//lançando exceção de argumento invalido ao inves de retornar uma string pode ser assim se quiser fazer de forma generica:
+			//throw new IllegalArgumentException("Reservation dates for update must be future dates") ;
+			//porem para fazer com exceção personalizada:
+			throw new DomainException("Reservation dates for update must be future dates");
 		}
 		if(!checkOut.after(checkIn)) {
-			return "Error in reservation: Check-out date must be after check-in date";
+			throw new DomainException("Error in reservation: Check-out date must be after check-in date") ;
 		}
 		
 		this.checkIn=checkIn;
 		this.checkOut=checkOut;
-		return null;//apenas para retornar uma string q o metodo exige
+		
 	}
 	@Override
 	public String toString() {
