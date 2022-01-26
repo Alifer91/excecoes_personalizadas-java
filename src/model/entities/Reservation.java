@@ -40,9 +40,18 @@ public class Reservation {
 		long diff= checkOut.getTime()-checkIn.getTime();//get time retorna valor em milissegundos(long) 
 		return TimeUnit.DAYS.convert(diff,TimeUnit.MILLISECONDS); //converte os milisegundos em dias  e dentro dos parenteses deve ser colocado o tipo de unidade de tempo
 	}
-	public void updateDates(Date checkIn, Date checkOut) {
+	public String updateDates(Date checkIn, Date checkOut) {
+		Date now = new Date();
+		if(checkIn.before(now)|| checkOut.before(now)){//trouxe as validações para a classe adequada
+			return "Error in reservation: Reservation dates for update must be future dates";
+		}
+		if(!checkOut.after(checkIn)) {
+			return "Error in reservation: Check-out date must be after check-in date";
+		}
+		
 		this.checkIn=checkIn;
 		this.checkOut=checkOut;
+		return null;//apenas para retornar uma string q o metodo exige
 	}
 	@Override
 	public String toString() {
